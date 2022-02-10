@@ -74,7 +74,7 @@ ttf_extract <- function(ttfiles) {
             stdout = TRUE, stderr = TRUE)
 
     #fontnameidx <- grepl("^FontName ", ret)
-    message(tmpfiles[i])
+    #message(tmpfiles[i])
     ret <- readLines(paste0(tmpfiles[i],".afm"))
     fontnameidx <- grepl("^FontName", ret)
 
