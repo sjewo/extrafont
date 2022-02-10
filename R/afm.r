@@ -22,6 +22,7 @@ afm_get_info <- function(filename) {
   } else {
     fd <- file(filename, "r")
   }
+
   # Reading 30 lines should be more than enough.
   # Suppress warning: "seek on a gzfile connection returned an internal error"
   text <- suppressWarnings(readLines(fd, 30))
@@ -35,6 +36,9 @@ afm_get_info <- function(filename) {
   FontName   <- sub("^FontName ",   "", text[grepl("^FontName",   text)])
   FullName   <- sub("^FullName ",   "", text[grepl("^FullName",   text)])
   weight     <- sub("^Weight ",   "", text[grepl("^Weight",   text)])
+
+  if(length(weight)==0)
+    weight <- ""
 
   # Read in the Weight and figure out of it's Bold
   if (grepl("Bold", weight)) {
