@@ -10,7 +10,6 @@
 #' @param recursive Search recursively in directories? (Default TRUE)
 #' @param pattern A regular expression that the filenames must match.
 #'
-#' @importFrom Rttf2pt1 which_ttf2pt1
 #' @export
 ttf_import <- function(paths = NULL, recursive = TRUE, pattern = NULL) {
 
@@ -56,7 +55,7 @@ ttf_extract <- function(ttfiles) {
   message("Extracting .afm files from .ttf files...")
 
   # This stores information about the fonts
-  fontdata <- data.frame(fontfile = ttfiles, FontName = "", 
+  fontdata <- data.frame(fontfile = ttfiles, FontName = "",
                          stringsAsFactors = FALSE)
 
   outfiles <- file.path(metrics_path(),
@@ -66,26 +65,19 @@ ttf_extract <- function(ttfiles) {
   tmpfiles <- file.path(tempdir(), "fonts",
                 sub("\\.ttf$", "", basename(ttfiles), ignore.case = TRUE))
 
-  ttf2pt1 <- which_ttf2pt1()
-
-  # Windows passes the args differently
-  # -pft means use Freetype to process fonts
-  # -a means extract all glyphs (needed for minus sign - latin1 doesn't include it)
-  # -GfAe means extract AFM file only
-  if (.Platform$OS.type == "windows")  args <- c("-a", "-G", "fAe")
-  else                                 args <- c("-a", "-GfAe")
-
   for (i in seq_along(ttfiles)) {
     message(ttfiles[i], appendLF = FALSE)
 
     # This runs:
-    #  ttf2pt1 -GfAe /Library/Fonts/Impact.ttf /out/path/Impact
-    # The -GfAe options tell it to only create the .afm file, and not the
-    # .t1a/pfa/pfb or .enc files. Run 'ttf2pt1 -G?' for more info.
-    ret <- system2(enc2native(ttf2pt1), c(args, shQuote(ttfiles[i]), shQuote(tmpfiles[i])),
+    #  ttf2afm /Library/Fonts/Impact.ttf /out/path/Impact
+    ret <- system2(enc2native("ttf2afm"), c(shQuote(ttfiles[i]), "-o", shQuote(paste0(tmpfiles[i],".afm"))),
             stdout = TRUE, stderr = TRUE)
 
-    fontnameidx <- grepl("^FontName ", ret)
+    #fontnameidx <- grepl("^FontName ", ret)
+    message(tmpfiles[i])
+    ret <- readLines(paste0(tmpfiles[i],".afm"))
+    fontnameidx <- grepl("^FontName", ret)
+
     if (sum(fontnameidx) == 0) {
       fontname <- ""
     } else if (sum(fontnameidx) == 1) {
