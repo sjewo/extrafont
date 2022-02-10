@@ -51,6 +51,7 @@ ttf_import <- function(paths = NULL, recursive = TRUE, pattern = NULL) {
 
 # Extract .afm  files from TrueType fonts.
 # Returns mapping between .ttf file name and FontName
+#' @importFrom tinytex tinytex_root tlmgr
 ttf_extract <- function(ttfiles) {
   message("Extracting .afm files from .ttf files...")
 
@@ -70,7 +71,7 @@ ttf_extract <- function(ttfiles) {
 
     # This runs:
     #  ttf2afm /Library/Fonts/Impact.ttf /out/path/Impact
-    ret <- system2(enc2native("ttf2afm"), c(shQuote(ttfiles[i]), "-o", shQuote(paste0(tmpfiles[i],".afm"))),
+    ret <- system2(enc2native(paste0(tinytex_root(),"/bin/",tlmgr('print-platform', stdout=TRUE, .quiet = TRUE),"/ttf2afm")), c(shQuote(ttfiles[i]), "-o", shQuote(paste0(tmpfiles[i],".afm"))),
             stdout = TRUE, stderr = TRUE)
 
     #fontnameidx <- grepl("^FontName ", ret)
